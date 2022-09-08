@@ -1,0 +1,3 @@
+/Users/gustavogonzalez/Universidad/CuartoSemestre/MicroProcesadores/Laboratorios/Lab4pt2/cmake-build-debug/CMakeFiles/Lab4pt2.dir
+/Users/gustavogonzalez/Universidad/CuartoSemestre/MicroProcesadores/Laboratorios/Lab4pt2/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/gustavogonzalez/Universidad/CuartoSemestre/MicroProcesadores/Laboratorios/Lab4pt2/cmake-build-debug/CMakeFiles/rebuild_cache.dir
