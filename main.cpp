@@ -3,6 +3,7 @@
 using  namespace std;
 
 //variables
+int maxBags = 400;
 int silo = 0;
 int bodega = 0;
 pthread_mutex_t sumMutex;
@@ -10,20 +11,39 @@ pthread_cond_t condSilo;
 
 
 void* tostadora(void* args){
-    sleep(1);
-    cout << "Holii" << endl;
-    pthread_mutex_lock(&sumMutex);
-    silo++;
-    pthread_mutex_unlock(&sumMutex);
+    while(maxBags > 0){
+        sleep(1);
+        pthread_mutex_lock(&sumMutex);
+
+        cout << "Libras en el silo: "<<silo << endl;
+        silo++;
+        maxBags--;
+
+        pthread_mutex_unlock(&sumMutex);
+        pthread_cond_signal(&condSilo);
+    }
 }
 
 void* empacadora(void* args){
+    pthread_mutex_lock(&sumMutex);
     while (silo < 5){
         cout<< "Libras en el silo son  menores a 5.  Esperando... " << endl;
         pthread_cond_wait(&condSilo,&sumMutex);
     }
-    bodega+=5;
     pthread_mutex_unlock(&sumMutex);
+
+    while(silo > 1){
+        pthread_mutex_lock(&sumMutex);
+
+        bodega += 1;
+        silo -= 1;
+        cout << "Bolsas en bodega: " << bodega << endl;
+
+        pthread_mutex_unlock(&sumMutex);
+        sleep(1);
+    }
+
+
 }
 
 int main() {
@@ -31,20 +51,15 @@ int main() {
     pthread_mutex_init(&sumMutex, NULL);
     pthread_cond_init(&condSilo, NULL);
 
-    pthread_t thread_id;
-    pthread_attr_t attr;
+    pthread_t thread_id[3];
 
-    pthread_attr_init (&attr);
-    pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_JOINABLE);
+    pthread_create(&thread_id[0], nullptr, tostadora, nullptr);
+    pthread_create(&thread_id[1], nullptr, tostadora, nullptr);
+    pthread_create(&thread_id[2], nullptr, empacadora, nullptr);
 
-    pthread_create(&thread_id, &attr, tostadora, nullptr);
-    pthread_join(thread_id, nullptr);
-
-    pthread_create(&thread_id, &attr, tostadora, nullptr);
-    pthread_join(thread_id, nullptr);
-
-    pthread_create(&thread_id, &attr, empacadora, nullptr);
-    pthread_join(thread_id, nullptr);
+    for(auto thread : thread_id){
+        pthread_join(thread, nullptr);
+    }
 
     return 0;
 }
